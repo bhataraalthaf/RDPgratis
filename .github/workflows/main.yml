@@ -1,0 +1,22 @@
+name: Free Windows RDP
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up RDP
+      run: |
+        $password = "Perompak007" | ConvertTo-SecureString -AsPlainText -Force
+        New-LocalUser -Name "rdpuser" -Password $password -FullName "RDP User" -Description "User for RDP"
+        Add-LocalGroupMember -Group "Administrators" -Member "rdpuser"
+        Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Terminal Server" -Name "fDenyTSConnections" -Value 0
+        Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+        Write-Host "RDP is set up. Connect using the following details:"
+        Write-Host "Username: rdpuser"
+        Write-Host "Password: YourPasswordHere"
